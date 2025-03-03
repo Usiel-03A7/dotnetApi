@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "9rTchGUzX+Ox5kGDg/VF/XDQQT7050JNzg8NW4jJTXo=",
+  "Source": "VehicleCatalog.API",
+  "BasePath": "_content/VehicleCatalog.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
