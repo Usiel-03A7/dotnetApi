@@ -5,7 +5,7 @@ using VehicleCatalog.API.Models;
 
 namespace VehicleCatalog.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/vehicles")]
     [ApiController]
     public class VehiclesController : ControllerBase
     {
@@ -16,73 +16,93 @@ namespace VehicleCatalog.API.Controllers
             _context = context;
         }
 
-        // GET: api/vehicles
+        // 1️⃣ Obtener vehículos con paginación y filtros
         [HttpGet]
-        public ActionResult<IEnumerable<Vehicle>> GetVehicles()
+        public async Task<IActionResult> GetVehicles([FromQuery] string? term, [FromQuery] int? year, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            return _context.Vehicles
-                .Include(v => v.Brand) // Incluir la marca relacionada
-                .Include(v => v.Images) // Incluir las imágenes relacionadas
-                .ToList();
+            var query = _context.Vehicles
+                .Include(v => v.Brand)
+                .Include(v => v.Images)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(term))
+            {
+                query = query.Where(v => v.Model.Contains(term) || v.Brand.Name.Contains(term));
+            }
+
+            if (year.HasValue)
+            {
+                query = query.Where(v => v.Year == year.Value);
+            }
+
+            var totalRecords = await query.CountAsync();
+            var vehicles = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            Response.Headers.Add("Pagination", totalRecords.ToString());
+            Response.Headers.Add("Access-Control-Expose-Headers", "Pagination");
+
+            return Ok(vehicles);
         }
 
-        // GET: api/vehicles/5
+        // 2️⃣ Obtener un vehículo por ID
         [HttpGet("{id}")]
-        public ActionResult<Vehicle> GetVehicle(int id)
+        public async Task<IActionResult> GetVehicleById(int id)
         {
-            var vehicle = _context.Vehicles
-                .Include(v => v.Brand) // Incluir la marca relacionada
-                .Include(v => v.Images) // Incluir las imágenes relacionadas
-                .FirstOrDefault(v => v.Id == id);
+            var vehicle = await _context.Vehicles
+                .Include(v => v.Brand)
+                .Include(v => v.Images)
+                .FirstOrDefaultAsync(v => v.Id == id);
 
             if (vehicle == null)
-            {
-                return NotFound();
-            }
+                return NotFound(new { message = $"No existe vehículo con ID {id}" });
 
-            return vehicle;
+            return Ok(vehicle);
         }
 
-        // POST: api/vehicles
+        // 3️⃣ Crear un vehículo
         [HttpPost]
-        public ActionResult<Vehicle> PostVehicle(Vehicle vehicle)
+        public async Task<IActionResult> CreateVehicle([FromBody] Vehicle vehicle)
         {
+            var brand = await _context.Brands.FirstOrDefaultAsync(b => b.Id == vehicle.BrandId);
+            if (brand == null)
+                return BadRequest(new { message = $"No existe marca con ID {vehicle.BrandId}" });
+
+            vehicle.Brand = brand;
+
             _context.Vehicles.Add(vehicle);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetVehicle), new { id = vehicle.Id }, vehicle);
+            return Ok(vehicle);
         }
 
-        // PUT: api/vehicles/5
+        // 4️⃣ Editar un vehículo
         [HttpPut("{id}")]
-        public IActionResult PutVehicle(int id, Vehicle vehicle)
+        public async Task<IActionResult> UpdateVehicle(int id, [FromBody] Vehicle vehicle)
         {
-            if (id != vehicle.Id)
-            {
-                return BadRequest();
-            }
+            var existingVehicle = await _context.Vehicles.FindAsync(id);
+            if (existingVehicle == null)
+                return BadRequest(new { message = $"No existe vehículo con ID {id}" });
 
-            _context.Entry(vehicle).State = EntityState.Modified;
-            _context.SaveChanges();
+            existingVehicle.Model = vehicle.Model;
+            existingVehicle.Year = vehicle.Year;
+            existingVehicle.BrandId = vehicle.BrandId;
 
-            return NoContent();
+            await _context.SaveChangesAsync();
+            return Ok(existingVehicle);
         }
 
-        // DELETE: api/vehicles/5
+        // 5️⃣ Eliminar un vehículo
         [HttpDelete("{id}")]
-        public IActionResult DeleteVehicle(int id)
+        public async Task<IActionResult> DeleteVehicle(int id)
         {
-            var vehicle = _context.Vehicles.Find(id);
-
+            var vehicle = await _context.Vehicles.FindAsync(id);
             if (vehicle == null)
-            {
-                return NotFound();
-            }
+                return NotFound(new { message = $"No existe vehículo con ID {id}" });
 
             _context.Vehicles.Remove(vehicle);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok();
         }
     }
 }

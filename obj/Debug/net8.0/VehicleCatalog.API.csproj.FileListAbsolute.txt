@@ -6,6 +6,10 @@
 /home/usuario/Documents/netproject/VehicleCatalog.API/bin/Debug/net8.0/VehicleCatalog.API.runtimeconfig.json
 /home/usuario/Documents/netproject/VehicleCatalog.API/bin/Debug/net8.0/VehicleCatalog.API.dll
 /home/usuario/Documents/netproject/VehicleCatalog.API/bin/Debug/net8.0/VehicleCatalog.API.pdb
+/home/usuario/Documents/netproject/VehicleCatalog.API/bin/Debug/net8.0/AutoMapper.dll
+/home/usuario/Documents/netproject/VehicleCatalog.API/bin/Debug/net8.0/AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+/home/usuario/Documents/netproject/VehicleCatalog.API/bin/Debug/net8.0/FluentValidation.dll
+/home/usuario/Documents/netproject/VehicleCatalog.API/bin/Debug/net8.0/FluentValidation.DependencyInjectionExtensions.dll
 /home/usuario/Documents/netproject/VehicleCatalog.API/bin/Debug/net8.0/Humanizer.dll
 /home/usuario/Documents/netproject/VehicleCatalog.API/bin/Debug/net8.0/Microsoft.AspNetCore.OpenApi.dll
 /home/usuario/Documents/netproject/VehicleCatalog.API/bin/Debug/net8.0/Microsoft.Bcl.AsyncInterfaces.dll

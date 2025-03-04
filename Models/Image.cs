@@ -5,6 +5,6 @@ namespace VehicleCatalog.API.Models
         public int Id { get; set; }
         public string Url { get; set; } = string.Empty;
         public int VehicleId { get; set; }
-        public Vehicle? Vehicle { get; set; }
+        public Vehicle? Vehicle { get; set; } // Marca como anulable
     }
 }
