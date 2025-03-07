@@ -12,10 +12,11 @@ builder.Services.AddDbContext<VehicleCatalogDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Registrar AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 // Registrar FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<BrandValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<VehicleValidator>();
 
 // Registrar los servicios
 builder.Services.AddScoped<IBrandService, BrandService>();
@@ -28,13 +29,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configurar JsonSerializerOptions para manejar referencias circulares
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-    });
-
 var app = builder.Build();
 
 // Configurar el pipeline de HTTP
@@ -46,8 +40,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
-
-// Mapear los controladores
 app.MapControllers();
 
-app.Run();
+app.Run("http://localhost:7500");
